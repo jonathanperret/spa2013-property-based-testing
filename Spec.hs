@@ -11,7 +11,7 @@ data Measure = Measure Rational Unit | InvalidMeasure
   deriving (Show, Eq)
 
 instance Arbitrary Unit where
-  arbitrary = elements [ Meter, Second ]
+  arbitrary = elements [ Meter, Second, Unitless ]
 
 instance Num Measure where
   Measure x u1 + Measure y u2
