@@ -78,6 +78,8 @@ main = hspec $ do
       forAll positiveRational $ \x ->
         signum (-x) == -1
 
+    it "has zero sign for zero" $ do
+      signum 0 `shouldBe` 0
 
 
 -- Spec support code
