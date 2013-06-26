@@ -26,6 +26,8 @@ instance Num Measure where
       combine u1 Unitless = u1
       combine u1 u2 = (u1 :*: u2)
 
+  fromInteger n = Measure (fromInteger n) Unitless
+
 -- Specs start here
 
 main = hspec $ do
@@ -53,6 +55,9 @@ main = hspec $ do
         u1 /= Unitless && u2 /= Unitless ==>
           Measure x u1 * Measure y u2 == Measure (x * y) (u1 :*: u2)
 
+    it "converts from an integer to a unitless measure: " $ property $
+      \x ->
+        fromInteger x == Measure (fromInteger x) Unitless
 -- Spec support code
 
 instance Arbitrary Unit where
