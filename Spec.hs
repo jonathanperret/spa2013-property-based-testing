@@ -47,3 +47,7 @@ main = hspec $ do
       \(x, y, u)->
         Measure x u * Measure y Unitless == Measure (x*y) u
         && Measure x Unitless * Measure y u == Measure (x*y) u
+    it "multiplies units to get compound units" $ property $
+      \(Measure x u1, Measure y u2)->
+        u1 /= Unitless && u2 /= Unitless ==>
+          Measure x u1 * Measure y u2 == Measure (x * y) (u1 :*: u2)
