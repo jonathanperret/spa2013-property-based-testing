@@ -28,6 +28,8 @@ instance Num Measure where
 
   fromInteger n = Measure (fromInteger n) Unitless
 
+  abs m = Measure (abs $ value m) (unit m)
+
 -- Specs start here
 
 main = hspec $ do
@@ -58,6 +60,23 @@ main = hspec $ do
     it "converts from an integer to a unitless measure: " $ property $
       \x ->
         fromInteger x == Measure (fromInteger x) Unitless
+
+    it "calculates the absolute of a measure, regardless of unit" $ property $
+      \(x,u) ->
+        abs (Measure x u) == Measure (abs x) u
+
+  --  it "calculates the sign of a measures' value" $ property $
+  --    \(Measure x u) ->
+  --      signum (Measure x u) == signum x
+
+  describe "Arithmetic on Rational, characterization test" $ do
+    it "has a positive sign for positive numbers" $ property $
+      forAll positiveRational $ \x ->
+        signum x == 1
+
+positiveRational :: Gen (Positive Rational)
+positiveRational = arbitrary
+
 -- Spec support code
 
 instance Arbitrary Unit where
