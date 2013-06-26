@@ -26,15 +26,21 @@ instance Num Measure where
       combine u1 Unitless = u1
       combine u1 u2 = (u1 :*: u2)
 
+  fromInteger n = Measure (fromInteger n) Unitless
+
+  abs m = Measure (abs $ value m) (unit m)
+
+  signum m = Measure (sign) (unit m)
+    where sign = signum $ value m
 -- Specs start here
 
 main = hspec $ do
-  describe "Arithmetic on measures" $ do
+  describe "Arithmetic on Measures" $ do
     it "adds measures expressed in the same unit" $ property $
       \(x, y, u)->
         Measure x u + Measure y u == Measure (x + y) u
 
-    it "does adds measures expressed in different units" $ property $
+    it "adds measures expressed in different units" $ property $
       \(m1, m2)->
         unit m1 /= unit m2 ==>
           m1 + m2 == InvalidMeasure
@@ -52,6 +58,31 @@ main = hspec $ do
       \(Measure x u1, Measure y u2)->
         u1 /= Unitless && u2 /= Unitless ==>
           Measure x u1 * Measure y u2 == Measure (x * y) (u1 :*: u2)
+
+    it "converts from an integer to a unitless measure" $ property $
+      \x ->
+        fromInteger x == Measure (fromInteger x) Unitless
+
+    it "calculates the absolute of a measure, regardless of unit" $ property $
+      \(x,u) ->
+        abs (Measure x u) == Measure (abs x) u
+
+    it "calculates the sign of a measures' value" $ property $
+      \(Measure x u) ->
+        signum (Measure x u) == (Measure (signum x) u)
+
+  describe "Arithmetic on Rational, characterization test for signum" $ do
+    it "has a positive sign for positive numbers" $ property $
+      forAll positiveRational $ \x ->
+        signum x == 1
+    
+    it "has a negative sign for negative numbers" $ property $
+      forAll positiveRational $ \x ->
+        signum (-x) == -1
+
+    it "has zero sign for zero" $ do
+      signum 0 `shouldBe` 0
+
 
 -- Spec support code
 
@@ -71,4 +102,7 @@ instance Arbitrary Unit where
 
 instance Arbitrary Measure where
   arbitrary = Measure <$> arbitrary <*> arbitrary
+
+positiveRational :: Gen (Positive Rational)
+positiveRational = arbitrary
 
