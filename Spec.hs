@@ -69,13 +69,16 @@ main = hspec $ do
   --    \(Measure x u) ->
   --      signum (Measure x u) == signum x
 
-  describe "Arithmetic on Rational, characterization test" $ do
+  describe "Arithmetic on Rational, characterization test for signum" $ do
     it "has a positive sign for positive numbers" $ property $
       forAll positiveRational $ \x ->
         signum x == 1
+    
+    it "has a negative sign for negative numbers" $ property $
+      forAll positiveRational $ \x ->
+        signum (-x) == -1
 
-positiveRational :: Gen (Positive Rational)
-positiveRational = arbitrary
+
 
 -- Spec support code
 
@@ -95,4 +98,7 @@ instance Arbitrary Unit where
 
 instance Arbitrary Measure where
   arbitrary = Measure <$> arbitrary <*> arbitrary
+
+positiveRational :: Gen (Positive Rational)
+positiveRational = arbitrary
 
