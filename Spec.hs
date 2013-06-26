@@ -4,7 +4,7 @@ import Test.HUnit
 import Test.QuickCheck
 import Data.Ratio
 
-data Unit = Meter | Second
+data Unit = Meter | Second | Unitless
   deriving (Show, Eq)
 
 data Measure = Measure Rational Unit | InvalidMeasure
@@ -17,7 +17,10 @@ instance Num Measure where
   Measure x u1 + Measure y u2
     | u1 == u2 = Measure (x + y) u1
     | otherwise = InvalidMeasure
+
   negate (Measure x u) = Measure (-x) u
+
+  Measure x u * Measure y Unitless = Measure (x*y) u
 
 main = hspec $ do
   describe "Arithmetic on measures" $ do
@@ -30,3 +33,6 @@ main = hspec $ do
     it "subtracts measures expressed in the same unit" $ property $
       \(x, y, u)->
         Measure x u - Measure y u == Measure (x - y) u
+    it "multiplies a measure by a unitless measure" $ property $
+      \(x, y, u)->
+        Measure x u * Measure y Unitless == Measure (x*y) u
