@@ -58,9 +58,16 @@ main = hspec $ do
 instance Arbitrary Unit where
   arbitrary = makeUnit
     where
-      makeUnit :: Gen Unit
-      makeUnit = oneof [elements [Meter, Second, Watt, Unitless],
-                        liftM2 (:*:) makeUnit makeUnit]
+      simpleUnit = elements [Meter, Second, Watt, Unitless]
+      makeUnit = sized makeUnit'
+      makeUnit' 0 = simpleUnit
+      makeUnit' n = oneof [simpleUnit,
+                           do
+                            x1 <- simpleUnit
+                            x2 <- (makeUnit' n')
+                            return (x1 :*: x2)
+                           ]
+        where n' = n `div` 2
 
 instance Arbitrary Measure where
   arbitrary = Measure <$> arbitrary <*> arbitrary
